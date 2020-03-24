@@ -1,0 +1,116 @@
+Matei Andreea-Maria
+332CC
+Tema3
+
+ATENTIE! Comentariile din cod ma ajuta sa vad scalabilitatea. Le-am eliminat ca sa 
+nu astepte corectorul o groaza, asa cum am explicat mai jos.
+
+Masina mea virtuala are un numar de 4 core-uri, iar exemplele oferite pe moodle 
+merg corect indiferent de numarul de procese pentru fiecare filtru si scaleza.
+
+Am tinut cont in structura imaginii de tip, lungime, latime, maxval, de o 
+matrice pentru cazul cand avem imagini .pgm si de cate o matrice pentru 
+fiecare culoare rgb in cazul imaginilor .pnm. Am retinut filtrele in cate o 
+matrice de 3x3 ce are continutul deja rotit cu 180 pentru a o folosi direct.
+Procesul nr 0 se ocupa de citirea datelor: tip, inaltime, lungime, maxval. 
+Am avut grija si la linia cu comentariu din imagini sa o ignor.
+Tot aici imi bordez matricile de intrare cu 0 si le aloc memorie matricilor 
+necesare in functie de P5 sau P6. Trimit prin broadcast lungimea, latimea si 
+tipul. Imi aloc spatiu pentru matrici si pentru celelalte procese in functie 
+de tipul imaginii, dar si pentru o noua imagine ce reprezinta matricile 
+modificate.
+Parcurg filtrele, iar pentru fiecare trimit prin broadcast caracterele 
+imaginii retinute in matricile citite in functie de tip. Imi sectionez 
+matricile in functie de numarul procesului ce ruleaza. Parcurg bucata de 
+matrice, iar daca nu sunt pe margine aplic formulele pentru fiecare filtru 
+ca in enunt. Daca un caracter isi depaseste tipul de unsigned char (peste 255 
+sau sub 0) atunci il setez ca fiind ori 255 ori 0. Astfel il castez. Daca 
+sunt pe un caracter din bordura, acesta ramane 0 pentru a nu influenta.
+Pentru tipul imaginii P6 am facut o functie apply ce imi aplica filtrul 
+necesar pe fiecare matrice r, g, b pastrand principiile mai sus cu marginea 
+si castarea la 0 si 255. Aceste informatii sunt retinute in matricea cu 
+modificari specificata mai sus. Trimit pe fiecare proces bucata de matrice 
+modificata catre primul proces care le va primi si va reconstrui imaginea 
+in cea initiala. 
+La final, primul proces va afisa imaginea finala, modificata, tinand cont 
+sa afiseze doar continutul matricii, nu si marginile 0 in functie de P5 si P6.
+
+Am pus sa imi aplice filtrul de mai multe ori pentru a vedea clar cum scaleaza.
+Pentru color 150, pentru alb-negru de 100. Am ales, de asemena, testele cele 
+mai mari.
+
+Codul l-am lasat cu o singura aplicare pentru a nu astepta atata. Liniile 
+de care vorbesc cu aplicarea sunt comentate.
+
+rorschach.pgm emboss:
+1. 18.87
+2. 9.99
+3. 7.52
+4. 5.91
+
+rorschach.pgm blur:
+1. 16.86
+2. 8.84
+3. 6.59
+4. 5.20
+
+rorschach.pgm smooth:
+1. 19.55
+2. 10.14
+3. 6.79
+4. 6.19
+
+rorschach.pgm sharpen:
+1. 21.29
+2. 11.13
+3. 8.68
+4. 7.23
+
+rorschach.pgm mean:
+1. 20.38
+2. 10.68
+3. 7.93
+4. 5.94
+
+rorschach.pgm blur smooth sharpen emboss mean blur smooth sharpen emboss mean:
+1. 659.30
+2. 647.67
+3. 622.09
+4. 612.88
+
+landscape.pnm emboss:
+1. 192.74
+2. 191.91
+3. 174.62
+4. 166.34
+
+landscape.pnm blur:
+1. 312.35
+2. 317.08
+3. 215.92
+4. 200.20
+
+landscape.pnm smooth:
+1. 398.57
+2. 346.33
+3. 343.48
+4. 342.94
+
+landscape.pnm sharpen:
+1. 350.10
+2. 335.10
+3. 316.91
+4. 312.63
+
+landscape.pnm mean:
+1. 362.31
+2. 361.49
+3. 342.55
+4. 341.04
+
+landscape.pnm blur smooth sharpen emboss mean blur smooth sharpen emboss mean:
+1. 819.02
+2. 796.29
+3. 767.92
+4. 758.26
+
